@@ -1,0 +1,4 @@
+
+- Make tests quieter
+- Only run exhaustive tests if asked to
+
