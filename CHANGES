@@ -1,5 +1,9 @@
 Revision history for Perl extension RTF::Tokenizer.
 
+1.12  Fri Dec 31 16:30:00 2010
+	- Fixed source formatting and duplicated incorrect VERSION
+	  data
+
 1.11  Fri Dec 31 16:00:00 2010
 	- Tidied up the distro and removed some files that shouldn't have
 	  been included
