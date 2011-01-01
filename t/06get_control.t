@@ -1,4 +1,7 @@
+#!perl
 use strict;
+use warnings;
+
 use Test::More tests => 15;
 use RTF::Tokenizer;
 
@@ -20,4 +23,4 @@ ok( eq_array( [$tokenizer->get_token()], ['control', '*', ''] ), 'Read control' 
 ok( eq_array( [$tokenizer->get_token()], ['text', '5', ''] ), 'Read text' );
 ok( eq_array( [$tokenizer->get_token()], ['control', "'", 'ac'] ), 'Read control' );
 ok( eq_array( [$tokenizer->get_token()], ['text', 'More text!', ''] ), 'Read text' );
-ok( eq_array( [$tokenizer->get_token()], ['eof', 1, 0] ), 'EOF' ); 
+ok( eq_array( [$tokenizer->get_token()], ['eof', 1, 0] ), 'EOF' );

@@ -1,4 +1,6 @@
+#!perl
 use strict;
+use warnings;
 
 package RTF::Mokenizer;
 use RTF::Tokenizer;

@@ -53,6 +53,7 @@ package RTF::Tokenizer;
 use vars qw($VERSION);
 
 use strict;
+use warnings;
 use Carp;
 use IO::File;
 
@@ -310,13 +311,13 @@ sub get_token {
 			# We want to return text fields that have newlines in as one
 			# token, which requires a bit of work, as we read in one line
 			# at a time from out files...
-			my $temp_text;
+			my $temp_text = '';
 
 		READTEXT:
 
 			# Grab all the next 'text' characters
 			$self->{_BUFFER} =~ s/^([^\\{}]+)//s;
-			$temp_text .= $1;
+			$temp_text .= $1 if defined $1;
 
 			# If the buffer is empty, try reading in some more, and
 			# then go back to READTEXT to keep going. Now, the clever

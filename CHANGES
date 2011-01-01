@@ -1,5 +1,11 @@
 Revision history for Perl extension RTF::Tokenizer.
 
+1.13  Sat Jan 01 14:40:00 2010
+	- Made the test code a little cleaner, although there's still
+	  quite some work to be done there
+	- Run cleanly under warnings
+	- Shebang line in tests as a source-highlighter hint
+
 1.12  Fri Dec 31 16:30:00 2010
 	- Fixed source formatting and duplicated incorrect VERSION
 	  data

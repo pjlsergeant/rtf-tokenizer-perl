@@ -1,4 +1,7 @@
+#!perl
 use strict;
+use warnings;
+
 use Test::More tests => 13;
 use RTF::Tokenizer;
 use IO::File;

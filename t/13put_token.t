@@ -1,5 +1,6 @@
+#!perl
 use strict;
-
+use warnings;
 
 use RTF::Tokenizer;
 use Test::More tests => 9;

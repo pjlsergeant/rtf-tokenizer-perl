@@ -1,10 +1,13 @@
+#!perl
 
+# Some very basic sanity checks
 use strict;
-use Test::More tests => 5;
-use RTF::Tokenizer;
+use warnings;
+
+use Test::More tests => 6;
+use_ok('RTF::Tokenizer');
 
 my $tokenizer = RTF::Tokenizer->new();
-
 isa_ok( $tokenizer, 'RTF::Tokenizer', 'new returned an RTF::Tokenizer object' );
 
 # From a string as a class method
