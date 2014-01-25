@@ -476,14 +476,10 @@ sub _grab_control {
 	# A standard control word:
 	} elsif (
 		$self->{_BUFFER} =~ s/
-
 			^([a-z]{1,32})          # Lowercase word
 			(-?\d+)?                # Optional signed number
-			(
-				?:\s                  # Either whitespace, which we gobble
-			|
-				(?=[^a-z0-9]))        # or a non alpha-numeric, which we leave
-
+			(?:\s|(?=[^a-z0-9]))    # Either whitespace, which we gobble or a
+			                        # non alpha-numeric, which we leave
 			//ix
 	) {
 		# Return the control word, unless it's a \bin

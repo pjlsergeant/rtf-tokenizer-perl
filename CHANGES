@@ -1,5 +1,7 @@
 Revision history for Perl extension RTF::Tokenizer.
 
+1.14  Sat Jan 25 16:25:00 2014
+	- Stopped noisy regular expression matching
 1.13  Sat Jan 01 14:40:00 2010
 	- Made the test code a little cleaner, although there's still
 	  quite some work to be done there
