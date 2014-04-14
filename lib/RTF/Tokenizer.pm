@@ -187,18 +187,15 @@ sub read_file {
 sub _get_line {
 	my $self = shift();
 
-	# Turn off warnings for the rest of this sub (at some point I'll upgrade
-	# to 'no warnings "uninitialized"', but don't want to force a Perl version
-	# on people yet)
-	local ($^W);
-
 	# Localize the input record separator before changing it so
 	# we don't mess up any other part of the application running
 	# us that relies on it
 	local $/ = $self->{_IRS};
 
 	# Read the line itself
-	$self->{_BUFFER} .= $self->{_FILEHANDLE}->getline();
+	if ( my $line = $self->{_FILEHANDLE}->getline() ) {
+		$self->{_BUFFER} .= $line;
+	}
 }
 
 # Determine what kind of line-endings the file uses
@@ -366,6 +363,7 @@ sub get_token {
 
 			# If we were read from a file, try and get some more stuff
 			# in to the buffer, or return the 'eof' character
+			return ( 'eof', 1, 0 ) if $self->{_FILEHANDLE}->eof;
 			$self->_get_line;
 			return ( 'eof', 1, 0 ) unless $self->{_BUFFER};
 		}
