@@ -2,93 +2,92 @@ use strict;
 use Test::More tests => 252;
 use RTF::Tokenizer;
 
-my $DEBUG = 0; 
+my $DEBUG  = 0;
 my @tokens = (
-['control', 'pnrstart', '0'],
-['control', 'pnrxst', '0'],
-['control', 'pnrxst', '5'],
-['control', 'pnrxst', '0'],
-['control', 'pnrxst', '1'],
-['control', 'pnrxst', '0'],
-['control', 'pnrxst', '45'],
-['control', 'pnrxst', '0'],
-['control', 'pnrxst', '2'],
-['control', 'pnrxst', '0'],
-['control', 'pnrxst', '3'],
-['control', 'pnrxst', '0'],
-['control', 'pnrxst', '46'],
-['control', 'pnrstop', '12'],
-['control', 'pnrstart', '1'],
-['control', 'pnrrgb', '1'],
-['control', 'pnrrgb', '3'],
-['control', 'pnrrgb', '4'],
-['control', 'pnrrgb', '0'],
-['control', 'pnrrgb', '0'],
-['control', 'pnrrgb', '0'],
-['control', 'pnrrgb', '0'],
-['control', 'pnrrgb', '0'],
-['control', 'pnrrgb', '0'],
-['control', 'pnrstop', '9'],
-['control', 'pnrstart', '2'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '4'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrnfc', '0'],
-['control', 'pnrstop', '18'],
-['control', 'pnrstart', '3'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '3'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '4'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '2'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrpnbr', '0'],
-['control', 'pnrstop', '36'],
-['eof', '1', '0']
-);
+    [ 'control', 'pnrstart', '0' ],
+    [ 'control', 'pnrxst',   '0' ],
+    [ 'control', 'pnrxst',   '5' ],
+    [ 'control', 'pnrxst',   '0' ],
+    [ 'control', 'pnrxst',   '1' ],
+    [ 'control', 'pnrxst',   '0' ],
+    [ 'control', 'pnrxst',   '45' ],
+    [ 'control', 'pnrxst',   '0' ],
+    [ 'control', 'pnrxst',   '2' ],
+    [ 'control', 'pnrxst',   '0' ],
+    [ 'control', 'pnrxst',   '3' ],
+    [ 'control', 'pnrxst',   '0' ],
+    [ 'control', 'pnrxst',   '46' ],
+    [ 'control', 'pnrstop',  '12' ],
+    [ 'control', 'pnrstart', '1' ],
+    [ 'control', 'pnrrgb',   '1' ],
+    [ 'control', 'pnrrgb',   '3' ],
+    [ 'control', 'pnrrgb',   '4' ],
+    [ 'control', 'pnrrgb',   '0' ],
+    [ 'control', 'pnrrgb',   '0' ],
+    [ 'control', 'pnrrgb',   '0' ],
+    [ 'control', 'pnrrgb',   '0' ],
+    [ 'control', 'pnrrgb',   '0' ],
+    [ 'control', 'pnrrgb',   '0' ],
+    [ 'control', 'pnrstop',  '9' ],
+    [ 'control', 'pnrstart', '2' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '4' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrnfc',   '0' ],
+    [ 'control', 'pnrstop',  '18' ],
+    [ 'control', 'pnrstart', '3' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '3' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '4' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '2' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrpnbr',  '0' ],
+    [ 'control', 'pnrstop',  '36' ],
+    [ 'eof',     '1',        '0' ] );
 
 my $tokenizer = RTF::Tokenizer->new();
 
@@ -96,26 +95,25 @@ my $tokenizer = RTF::Tokenizer->new();
 $tokenizer->read_string( join '', <DATA> );
 
 if ($DEBUG) {
-	while (1) {
-		my ($type, $argument, $param) = $tokenizer->get_token();
-		print "['$type', '$argument', '$param'],\n";	
-		exit if $type eq 'eof';
-	}
+    while (1) {
+        my ( $type, $argument, $param ) = $tokenizer->get_token();
+        print "['$type', '$argument', '$param'],\n";
+        exit if $type eq 'eof';
+    }
 } else {
 
-	for (@tokens) {
-	
-		my ($ret_type, $ret_argument, $ret_parameter) = @{ $_ };
-		my ($type, $argument, $param) = $tokenizer->get_token();
-	
-		is( $type, $ret_type, "Correctly found '$type'");
-		is( $argument, $ret_argument, "Correctly found '$argument'");
-		is( $param, $ret_parameter, "Correctly found '$param'");
-	
-	}
+    for (@tokens) {
+
+        my ( $ret_type, $ret_argument, $ret_parameter ) = @{$_};
+        my ( $type, $argument, $param ) = $tokenizer->get_token();
+
+        is( $type,     $ret_type,      "Correctly found '$type'" );
+        is( $argument, $ret_argument,  "Correctly found '$argument'" );
+        is( $param,    $ret_parameter, "Correctly found '$param'" );
+
+    }
 
 }
-
 
 __DATA__
 \pnrstart0
