@@ -1,16 +1,24 @@
 Revision history for Perl extension RTF::Tokenizer.
 
+1.18  Sun Apr 20 13:55:00 2014
+    - Moved the RTF corpus in to one place
+    - Added a get_all_tokens method
+
 1.17  Sat Apr 19 17:05:00 2014
     - Added implicit dependencies
     - Perltidied the whole thing
     - Fixed a small bug with line endings
+
 1.16  Sat Apr 19 15:55:00 2014
     - Use "no warnings" instead of localizing ^W
     - Made the dependency on a new MakeMaker explicit
+
 1.15  Mon Apr 14 01:10:00 2014
     - Fixed noisy EOF issue: https://rt.cpan.org/Ticket/Display.html?id=82697
+
 1.14  Sat Jan 25 16:25:00 2014
     - Stopped noisy regular expression matching
+
 1.13  Sat Jan 01 14:40:00 2010
     - Made the test code a little cleaner, although there's still
       quite some work to be done there

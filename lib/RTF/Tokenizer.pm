@@ -38,6 +38,9 @@ Tokenizes RTF
  # Ooops, that was wrong...
 	$tokenizer->put_token( 'control', 'b', 1 );
 
+ # Let's have the lot...
+    my @tokens = $tokenizer->get_all_tokens();
+
 =head1 INTRODUCTION
 
 This documentation assumes some basic knowledge of RTF.
@@ -369,6 +372,26 @@ sub get_token {
             return ( 'eof', 1, 0 ) unless $self->{_BUFFER};
         }
     }
+}
+
+=head2 get_all_tokens
+
+As per C<get_token>, but keeps calling C<get_token> until it hits EOF. Returns
+a list of arrayrefs.
+
+=cut
+
+sub get_all_tokens {
+    my $self = shift;
+    my @tokens;
+
+    while (1) {
+        my $token = [ $self->get_token() ];
+        push( @tokens, $token );
+        last if $token->[0] eq 'eof';
+    }
+
+    return @tokens;
 }
 
 =head2 put_token( type, token, argument )

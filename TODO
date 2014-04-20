@@ -1,7 +1,0 @@
-The tests are a bit shonky - the 9xx ones do lots of code repetition that
-should be shouldered away in to its own Test module, and code like:
-
-  ok( eq_array( [$tokenizer->get_token()], ['control', 'rtf', 1] ), '\rtf1 read correctly' );
-
-is repeated over and over, enough that it would probably be helpful to factor
-that out too...
