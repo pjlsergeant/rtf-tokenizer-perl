@@ -10,7 +10,7 @@ my $unit_separator   = "\x{1f}";
 
 sub test_corpus {
     my $filename = shift;
-    my ( $test_name, $rtf, $expected_tokens ) = load_from_corpus( $filename );
+    my ( $test_name, $rtf, $expected_tokens ) = load_from_corpus($filename);
 
     # Check the standard tokenizer works
     my @actual_tokens = RTF::Tokenizer->new( string => $rtf )->get_all_tokens;
@@ -22,19 +22,20 @@ sub test_corpus {
 
 sub test_roundtrip {
     my ( $test_name, $rtf_string ) = @_;
-    my $result = '';
+    my $result        = '';
     my @actual_tokens = RTF::Tokenizer->new(
-        string => $rtf_string,
+        string              => $rtf_string,
         preserve_whitespace => 1,
     )->get_all_tokens;
-    for ( @actual_tokens ) {
+    for (@actual_tokens) {
         my ( $type, $argument, $parameter, $whitespace ) = @$_;
         $result .= $argument if $type eq 'text';
         $result .= '{' if $type eq 'group' && $argument;
-        $result .= '}' if $type eq 'group' && ! $argument;
+        $result .= '}' if $type eq 'group' && !$argument;
         if ( $type eq 'control' ) {
             $result .= "\\";
-            $result .= $_ for grep defined, ( $argument, $parameter, $whitespace );
+            $result .= $_
+                for grep defined, ( $argument, $parameter, $whitespace );
         }
     }
 
@@ -43,10 +44,10 @@ sub test_roundtrip {
 
 sub load_from_corpus {
     my $filename = shift;
-    my $data = read_file( $filename );
+    my $data     = read_file($filename);
 
     my ( $test_name, $rtf, $token_string ) = split( $group_separator, $data );
-    my @tokens_raw = split( $record_separator, $token_string);
+    my @tokens_raw = split( $record_separator, $token_string );
     my @tokens = map {
         my @fields = split( $unit_separator, $_ );
         push( @fields, '' ) unless @fields > 2;
@@ -58,7 +59,7 @@ sub load_from_corpus {
 
 sub write_corpus {
     my $filename = shift;
-    my $data = create_from_t( $filename );
+    my $data     = create_from_t($filename);
     my ($output) = $filename =~ m/9\d+(.+)\./;
     $output = 't/corpus/' . $output . '.corpus';
     open( FH, ">$output" ) || die $!;
@@ -69,15 +70,15 @@ sub write_corpus {
 
 sub create_from_t {
     my $filename = shift;
-    my $data = read_file( $filename );
+    my $data     = read_file($filename);
 
     my $test_name = $filename;
     $test_name =~ s/.+9\d*//;
     $test_name =~ s/\.t$//;
     $test_name =~ s/_/ /g;
-    $test_name = ucfirst( $test_name );
+    $test_name = ucfirst($test_name);
 
-    my ( $perl, $rtf ) = split(/\n__DATA__\n/, $data);
+    my ( $perl, $rtf ) = split( /\n__DATA__\n/, $data );
 
     return create( $test_name, $rtf );
 }
@@ -86,7 +87,8 @@ sub create {
     my ( $test_name, $rtf ) = @_;
     my @tokens = RTF::Tokenizer->new( string => $rtf )->get_all_tokens;
 
-    my $token_string = join $record_separator, map { join( $unit_separator, @$_ ) } @tokens;
+    my $token_string = join $record_separator,
+        map { join( $unit_separator, @$_ ) } @tokens;
 
     return join $group_separator, $test_name, $rtf, $token_string;
 }

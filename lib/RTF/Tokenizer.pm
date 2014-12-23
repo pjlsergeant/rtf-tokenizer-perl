@@ -14,29 +14,29 @@ Tokenizes RTF
  use RTF::Tokenizer;
 
  # Create a tokenizer object
-	my $tokenizer = RTF::Tokenizer->new();
+    my $tokenizer = RTF::Tokenizer->new();
 
-	my $tokenizer = RTF::Tokenizer->new( string => '{\rtf1}'  );
-	my $tokenizer = RTF::Tokenizer->new( string => '{\rtf1}', note_escapes => 1 );
+    my $tokenizer = RTF::Tokenizer->new( string => '{\rtf1}'  );
+    my $tokenizer = RTF::Tokenizer->new( string => '{\rtf1}', note_escapes => 1 );
 
-	my $tokenizer = RTF::Tokenizer->new( file   => \*STDIN    );
-	my $tokenizer = RTF::Tokenizer->new( file   => 'lala.rtf' );
-	my $tokenizer = RTF::Tokenizer->new( file   => 'lala.rtf', sloppy => 1 );
+    my $tokenizer = RTF::Tokenizer->new( file   => \*STDIN    );
+    my $tokenizer = RTF::Tokenizer->new( file   => 'lala.rtf' );
+    my $tokenizer = RTF::Tokenizer->new( file   => 'lala.rtf', sloppy => 1 );
 
  # Populate it from a file
-	$tokenizer->read_file('filename.txt');
+    $tokenizer->read_file('filename.txt');
 
  # Or a file handle
-	$tokenizer->read_file( \*STDIN );
+    $tokenizer->read_file( \*STDIN );
 
  # Or a string
-	$tokenizer->read_string( '{\*\some rtf}' );
+    $tokenizer->read_string( '{\*\some rtf}' );
 
  # Get the first token
-	my ( $token_type, $argument, $parameter ) = $tokenizer->get_token();
+    my ( $token_type, $argument, $parameter ) = $tokenizer->get_token();
 
  # Ooops, that was wrong...
-	$tokenizer->put_token( 'control', 'b', 1 );
+    $tokenizer->put_token( 'control', 'b', 1 );
 
  # Let's have the lot...
     my @tokens = $tokenizer->get_all_tokens();
@@ -292,7 +292,7 @@ only returned for escapes.
 # Define a regular expression that matches characters which are 'text' -
 # that is, they're not a backspace, a scoping brace, or discardable
 # whitespace.
-my $non_text_standard_re = qr/[^\\{}\r\n]/;
+my $non_text_standard_re   = qr/[^\\{}\r\n]/;
 my $non_text_whitespace_re = qr/[^\\{}]/;
 
 sub get_token {
@@ -320,7 +320,8 @@ sub get_token {
         return @return_values;
     }
 
-    my $non_text_re = $self->{_WHITESPACE} ? $non_text_whitespace_re : $non_text_standard_re;
+    my $non_text_re =
+        $self->{_WHITESPACE} ? $non_text_whitespace_re : $non_text_standard_re;
 
     # Our main parsing loop
     while (1) {
@@ -430,7 +431,7 @@ is on a first in last out basis.
 sub put_token {
     my $self = shift;
 
-    push( @{ $self->{_PUT_TOKEN_CACHE} }, [ @_ ] );
+    push( @{ $self->{_PUT_TOKEN_CACHE} }, [@_] );
 
     # No need to set this to the real value of the token cache, as
     # it'll get set properly when we try and read a cached token.
@@ -527,9 +528,9 @@ my $control_word_whitespace_re = qr/
 sub _grab_control {
     my $self = shift;
 
-    my $whitespace_re = $self->{_WHITESPACE} ?
-        $control_word_whitespace_re :
-        $control_word_standard_re ;
+    my $whitespace_re =
+        $self->{_WHITESPACE} ? $control_word_whitespace_re :
+        $control_word_standard_re;
 
     # Check for a star here, as it simplifies our regex below,
     # and it occurs pretty often
@@ -537,8 +538,7 @@ sub _grab_control {
         return ( '*', '' );
 
         # A standard control word:
-    } elsif ( $self->{_BUFFER} =~ s/$whitespace_re// )
-    {
+    } elsif ( $self->{_BUFFER} =~ s/$whitespace_re// ) {
         # Return the control word, unless it's a \bin
         my $param = '';
         $param = $2 if defined($2);
