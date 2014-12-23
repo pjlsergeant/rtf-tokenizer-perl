@@ -72,15 +72,22 @@ C<file> - calls the C<read_file> method with the value provided after instantiat
 
 C<string> - calls the C<read_string> method with the value provided after instantiation
 
-C<note_escapes> - boolean - whether to give RTF Escapes a token type of C<escape> (true) or C<control> (false)
+C<note_escapes> - boolean - whether to give RTF Escapes a token type of C<escape> (true) or
+C<control> (false, default)
 
-C<sloppy> - boolean - whether or not to allow some illegal but common RTF sequences found 'in the wild'. As of C<1.08>, this currently only allows
-control words with a numeric argument to have a text field right after with
-no delimiter, like:
+C<sloppy> - boolean - whether or not to allow some illegal but common RTF sequences found
+'in the wild'. As of C<1.08>, this currently only allows control words with a numeric
+argument to have a text field right after with no delimiter, like:
 
  \control1Plaintext
 
-but this may change in future releases.
+but this may change in future releases. Defaults false.
+
+C<preserve_whitespace> - boolean - ... the RTF specification tells you to strip whitespace
+which comes after control words, and newlines at the beginning and ending of text areas.
+One result of that is that you can't actually round-trip the output of the tokenization
+process. Turning this on is probably a bad idea, but someone cared enough to send me a
+patch for it, so why not. Defaults false, and you should leave it that way.
 
 =cut
 
@@ -114,6 +121,7 @@ sub new {
     # Set up final config stuff
     $self->{_NOTE_ESCAPES} = $config{'note_escapes'};
     $self->{_SLOPPY}       = $config{'sloppy'};
+    $self->{_WHITESPACE}   = $config{'preserve_whitespace'};
 
     return $self;
 
@@ -239,6 +247,9 @@ sub _line_endings {
 Returns the next token as a three-item list: 'type', 'argument', 'parameter'.
 Token is one of: C<text>, C<control>, C<group>, C<escape> or C<eof>.
 
+If you turned on C<preserve_whitespace>, then you may get a forth item for
+C<control> tokens.
+
 =over
 
 =item C<text>
@@ -253,6 +264,9 @@ rather than rendered as text for you, as are C<\_>, C<\-> and friends.
 'parameter' is the control word's parameter if it has one - this will
 be numeric, EXCEPT when 'argument' is a literal ', in which case it
 will be a two-letter hex string.
+
+If you turned on C<preserve_whitespace>, you'll get a forth item,
+which will be the whitespace or a defined empty string.
 
 =item C<group>
 
@@ -274,6 +288,12 @@ only returned for escapes.
 =back
 
 =cut
+
+# Define a regular expression that matches characters which are 'text' -
+# that is, they're not a backspace, a scoping brace, or discardable
+# whitespace.
+my $non_text_standard_re = qr/[^\\{}\r\n]/;
+my $non_text_whitespace_re = qr/[^\\{}]/;
 
 sub get_token {
     my $self = shift;
@@ -300,13 +320,15 @@ sub get_token {
         return @return_values;
     }
 
+    my $non_text_re = $self->{_WHITESPACE} ? $non_text_whitespace_re : $non_text_standard_re;
+
     # Our main parsing loop
     while (1) {
 
         my $start_character = substr( $self->{_BUFFER}, 0, 1, '' );
 
         # Most likely to be text, so we check for that first
-        if ( $start_character =~ /[^\\{}\r\n]/ ) {
+        if ( $start_character =~ $non_text_re ) {
             no warnings 'uninitialized';
 
             # We want to return text fields that have newlines in as one
@@ -333,7 +355,9 @@ sub get_token {
 
             # Make sure we're not including newlines in our output,
             # as RTF spec says they're to be ignored...
-            $temp_text =~ s/(\cM\cJ|\cM|\cJ)//g;
+            unless ( $self->{_WHITESPACE} ) {
+                $temp_text =~ s/(\cM\cJ|\cM|\cJ)//g;
+            }
 
             # Give the user a shiny token back
             return ( 'text', $start_character . $temp_text, '' );
@@ -404,11 +428,9 @@ is on a first in last out basis.
 =cut
 
 sub put_token {
-
     my $self = shift;
-    my ( $type, $token, $argument ) = ( shift, shift, shift );
 
-    push( @{ $self->{_PUT_TOKEN_CACHE} }, [ $type, $token, $argument ] );
+    push( @{ $self->{_PUT_TOKEN_CACHE} }, [ @_ ] );
 
     # No need to set this to the real value of the token cache, as
     # it'll get set properly when we try and read a cached token.
@@ -487,8 +509,27 @@ sub debug {
 
 # Work with control characters
 
+# It's ugly to repeat myself here, but I believe having two literal re's
+# here is going to offer a small performance benefit over a regex with
+# a scalar in it.
+my $control_word_standard_re = qr/
+            ^([a-z]{1,32})          # Lowercase word
+            (-?\d+)?                # Optional signed number
+            (?:\s|(?=[^a-z0-9]))    # Either whitespace, which we gobble or a
+                                    # non alpha-numeric, which we leave
+            /ix;
+my $control_word_whitespace_re = qr/
+            ^([a-z]{1,32})          # Lowercase word
+            (-?\d+)?                # Optional signed number
+            (\s*)?                  # Capture trailing whitespace
+            /ix;
+
 sub _grab_control {
     my $self = shift;
+
+    my $whitespace_re = $self->{_WHITESPACE} ?
+        $control_word_whitespace_re :
+        $control_word_standard_re ;
 
     # Check for a star here, as it simplifies our regex below,
     # and it occurs pretty often
@@ -496,23 +537,23 @@ sub _grab_control {
         return ( '*', '' );
 
         # A standard control word:
-    } elsif (
-        $self->{_BUFFER} =~ s/
-			^([a-z]{1,32})          # Lowercase word
-			(-?\d+)?                # Optional signed number
-			(?:\s|(?=[^a-z0-9]))    # Either whitespace, which we gobble or a
-			                        # non alpha-numeric, which we leave
-			//ix
-        )
+    } elsif ( $self->{_BUFFER} =~ s/$whitespace_re// )
     {
         # Return the control word, unless it's a \bin
         my $param = '';
         $param = $2 if defined($2);
-        return ( $1, $param ) unless $1 eq 'bin';
+
+        my @whitespace;
+        if ( $self->{_WHITESPACE} ) {
+            push( @whitespace, defined $3 ? $3 : '' );
+        }
+
+        return ( $1, $param, @whitespace ) unless $1 eq 'bin';
 
         # Pre-grab the binary data, and return the control word
-        $self->_grab_bin($2);
-        return ( 'bin', $2 );
+        my $byte_count = $2;
+        $self->_grab_bin($byte_count);
+        return ( 'bin', $byte_count, @whitespace );
 
         # hex-dec character (escape)
     } elsif ( $self->{_BUFFER} =~ s/^'([0-9a-f]{2})//i ) {
